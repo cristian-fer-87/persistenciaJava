@@ -6,6 +6,7 @@
 package modelo;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.*;
 
 /**
@@ -17,8 +18,18 @@ import javax.persistence.*;
 public class Vehiculo implements Serializable{
     @Id
     @Column(name="codigo")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private int codigo;
+
+    @Column(name="modelo")
     private String modelo;
+    
+    @OneToOne
+    @JoinColumn(name="motor")
+    private Motor motor;
+    
+    @OneToMany(mappedBy = "vehiculo", cascade = CascadeType.REMOVE)
+    private List<Rueda> ruedas;
     
     public Vehiculo(){}
 
@@ -37,7 +48,21 @@ public class Vehiculo implements Serializable{
     public void setModelo(String modelo) {
         this.modelo = modelo;
     }
-    
-    
-    
+
+    public Motor getMotor() {
+        return motor;
+    }
+
+    public void setMotor(Motor motor) {
+        this.motor = motor;
+    }
+
+    public List<Rueda> getRuedas() {
+        return ruedas;
+    }
+
+    public void setRuedas(List<Rueda> ruedas) {
+        this.ruedas = ruedas;
+    }
+
 }

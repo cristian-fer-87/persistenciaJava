@@ -6,20 +6,22 @@
 package persistencia;
 
 import java.io.Serializable;
-import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import modelo.Motor;
+import modelo.Rueda;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import modelo.Vehiculo;
 import persistencia.exceptions.NonexistentEntityException;
-import persistencia.exceptions.PreexistingEntityException;
 
 /**
  *
- * @author Leo
+ * @author cristian
  */
 public class VehiculoJpaController implements Serializable {
 
@@ -32,18 +34,45 @@ public class VehiculoJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Vehiculo vehiculo) throws PreexistingEntityException, Exception {
+    public void create(Vehiculo vehiculo) {
+        if (vehiculo.getRuedas() == null) {
+            vehiculo.setRuedas(new ArrayList<Rueda>());
+        }
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            em.persist(vehiculo);
-            em.getTransaction().commit();
-        } catch (Exception ex) {
-            if (findVehiculo(vehiculo.getCodigo()) != null) {
-                throw new PreexistingEntityException("Vehiculo " + vehiculo + " already exists.", ex);
+            Motor motor = vehiculo.getMotor();
+            if (motor != null) {
+                motor = em.getReference(motor.getClass(), motor.getCodigo());
+                vehiculo.setMotor(motor);
             }
-            throw ex;
+            List<Rueda> attachedRuedas = new ArrayList<Rueda>();
+            for (Rueda ruedasRuedaToAttach : vehiculo.getRuedas()) {
+                ruedasRuedaToAttach = em.getReference(ruedasRuedaToAttach.getClass(), ruedasRuedaToAttach.getCodigo());
+                attachedRuedas.add(ruedasRuedaToAttach);
+            }
+            vehiculo.setRuedas(attachedRuedas);
+            em.persist(vehiculo);
+            if (motor != null) {
+                Vehiculo oldVehiculoOfMotor = motor.getVehiculo();
+                if (oldVehiculoOfMotor != null) {
+                    oldVehiculoOfMotor.setMotor(null);
+                    oldVehiculoOfMotor = em.merge(oldVehiculoOfMotor);
+                }
+                motor.setVehiculo(vehiculo);
+                motor = em.merge(motor);
+            }
+            for (Rueda ruedasRueda : vehiculo.getRuedas()) {
+                Vehiculo oldVehiculoOfRuedasRueda = ruedasRueda.getVehiculo();
+                ruedasRueda.setVehiculo(vehiculo);
+                ruedasRueda = em.merge(ruedasRueda);
+                if (oldVehiculoOfRuedasRueda != null) {
+                    oldVehiculoOfRuedasRueda.getRuedas().remove(ruedasRueda);
+                    oldVehiculoOfRuedasRueda = em.merge(oldVehiculoOfRuedasRueda);
+                }
+            }
+            em.getTransaction().commit();
         } finally {
             if (em != null) {
                 em.close();
@@ -56,7 +85,53 @@ public class VehiculoJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
+            Vehiculo persistentVehiculo = em.find(Vehiculo.class, vehiculo.getCodigo());
+            Motor motorOld = persistentVehiculo.getMotor();
+            Motor motorNew = vehiculo.getMotor();
+            List<Rueda> ruedasOld = persistentVehiculo.getRuedas();
+            List<Rueda> ruedasNew = vehiculo.getRuedas();
+            if (motorNew != null) {
+                motorNew = em.getReference(motorNew.getClass(), motorNew.getCodigo());
+                vehiculo.setMotor(motorNew);
+            }
+            List<Rueda> attachedRuedasNew = new ArrayList<Rueda>();
+            for (Rueda ruedasNewRuedaToAttach : ruedasNew) {
+                ruedasNewRuedaToAttach = em.getReference(ruedasNewRuedaToAttach.getClass(), ruedasNewRuedaToAttach.getCodigo());
+                attachedRuedasNew.add(ruedasNewRuedaToAttach);
+            }
+            ruedasNew = attachedRuedasNew;
+            vehiculo.setRuedas(ruedasNew);
             vehiculo = em.merge(vehiculo);
+            if (motorOld != null && !motorOld.equals(motorNew)) {
+                motorOld.setVehiculo(null);
+                motorOld = em.merge(motorOld);
+            }
+            if (motorNew != null && !motorNew.equals(motorOld)) {
+                Vehiculo oldVehiculoOfMotor = motorNew.getVehiculo();
+                if (oldVehiculoOfMotor != null) {
+                    oldVehiculoOfMotor.setMotor(null);
+                    oldVehiculoOfMotor = em.merge(oldVehiculoOfMotor);
+                }
+                motorNew.setVehiculo(vehiculo);
+                motorNew = em.merge(motorNew);
+            }
+            for (Rueda ruedasOldRueda : ruedasOld) {
+                if (!ruedasNew.contains(ruedasOldRueda)) {
+                    ruedasOldRueda.setVehiculo(null);
+                    ruedasOldRueda = em.merge(ruedasOldRueda);
+                }
+            }
+            for (Rueda ruedasNewRueda : ruedasNew) {
+                if (!ruedasOld.contains(ruedasNewRueda)) {
+                    Vehiculo oldVehiculoOfRuedasNewRueda = ruedasNewRueda.getVehiculo();
+                    ruedasNewRueda.setVehiculo(vehiculo);
+                    ruedasNewRueda = em.merge(ruedasNewRueda);
+                    if (oldVehiculoOfRuedasNewRueda != null && !oldVehiculoOfRuedasNewRueda.equals(vehiculo)) {
+                        oldVehiculoOfRuedasNewRueda.getRuedas().remove(ruedasNewRueda);
+                        oldVehiculoOfRuedasNewRueda = em.merge(oldVehiculoOfRuedasNewRueda);
+                    }
+                }
+            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
@@ -85,6 +160,16 @@ public class VehiculoJpaController implements Serializable {
                 vehiculo.getCodigo();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The vehiculo with id " + id + " no longer exists.", enfe);
+            }
+            Motor motor = vehiculo.getMotor();
+            if (motor != null) {
+                motor.setVehiculo(null);
+                motor = em.merge(motor);
+            }
+            List<Rueda> ruedas = vehiculo.getRuedas();
+            for (Rueda ruedasRueda : ruedas) {
+                ruedasRueda.setVehiculo(null);
+                ruedasRueda = em.merge(ruedasRueda);
             }
             em.remove(vehiculo);
             em.getTransaction().commit();
