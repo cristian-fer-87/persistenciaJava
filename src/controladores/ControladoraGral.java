@@ -5,8 +5,10 @@
  */
 package controladores;
 
+import persistencia.ChoferJpaController;
 import persistencia.ControladoraPersistencia;
 import persistencia.EstacionamientoJpaController;
+import persistencia.MecanicoJpaController;
 import persistencia.MotorJpaController;
 import persistencia.RuedaJpaController;
 import persistencia.VehiculoJpaController;
@@ -20,6 +22,8 @@ public class ControladoraGral extends ControladoraPersistencia{
     private MotorJpaController motorJPA;
     private RuedaJpaController ruedaJpa;
     private EstacionamientoJpaController estacionamientoJPA;
+    private ChoferJpaController choferJPA;
+    private MecanicoJpaController mecanicoJPA;
             
     
     public ControladoraGral(){
@@ -27,6 +31,8 @@ public class ControladoraGral extends ControladoraPersistencia{
         this.motorJPA = new MotorJpaController(getEmf());
         this.ruedaJpa = new RuedaJpaController(getEmf());
         this.estacionamientoJPA = new EstacionamientoJpaController(getEmf());
+        this.choferJPA = new ChoferJpaController(getEmf());
+        this.mecanicoJPA = new MecanicoJpaController(getEmf());
     }
 
     public VehiculoJpaController getVehiculoJPA() {
@@ -44,5 +50,15 @@ public class ControladoraGral extends ControladoraPersistencia{
     public EstacionamientoJpaController getEstacionamientoJPA() {
         return estacionamientoJPA;
     }
+
+    public ChoferJpaController getChoferJPA() {
+        return choferJPA;
+    }
+
+    public MecanicoJpaController getMecanicoJPA() {
+        return mecanicoJPA;
+    }
+    
+    
     
 }
