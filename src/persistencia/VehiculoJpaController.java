@@ -226,4 +226,19 @@ public class VehiculoJpaController implements Serializable {
         }
     }
     
+    public List<Vehiculo> traerVehiculosConMotorIgualA(int motor){
+
+        String sql = "SELECT object(v) FROM Vehiculo v WHERE v.motor.codigo = "+motor;
+        Query query = getEntityManager().createQuery(sql);
+        return query.getResultList();
+    }
+    
+    
+    public Vehiculo traerVehiculoConMotorIgualA(int motor){
+
+        String sql = "SELECT object(v) FROM Vehiculo v WHERE v.motor.codigo = "+motor;
+        Query query = getEntityManager().createQuery(sql);
+        return (Vehiculo) query.getSingleResult();
+    }
+    
 }
