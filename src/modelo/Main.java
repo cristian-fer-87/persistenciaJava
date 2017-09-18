@@ -7,7 +7,10 @@ package modelo;
 
 import controladores.ControladoraGral;
 import java.util.List;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import modelo.Vehiculo;
+import reportes.Reporte;
 
 /**
  *
@@ -65,14 +68,14 @@ public class Main {
         
         //Traer un vehiculo
         
-        Vehiculo vehi = contGral.getVehiculoJPA().findVehiculo(2);
-        System.out.println("El unico vehiculo: "+vehi.getModelo());
+        //Vehiculo vehi = contGral.getVehiculoJPA().findVehiculo(2);
+        //System.out.println("El unico vehiculo: "+vehi.getModelo());
         
         //Eliminar un vehiculo
         //contGral.getVehiculoJPA().destroy(vehi.getCodigo());
         
         //Traer todos los vehiculos
-        List<Vehiculo> vehiculos = contGral.getVehiculoJPA().findVehiculoEntities();
+        /*List<Vehiculo> vehiculos = contGral.getVehiculoJPA().findVehiculoEntities();
         for (Vehiculo vehiculo : vehiculos) {
             System.out.println("Modelo: "+vehiculo.getModelo());
         }
@@ -84,7 +87,17 @@ public class Main {
         Vehiculo v = contGral.getVehiculoJPA().traerVehiculoConMotorIgualA(1);
         System.out.println(v.getModelo());
         
-        System.out.println("Hay "+contGral.getVehiculoJPA().getVehiculoCount()+" vehiculos");
+        System.out.println("Hay "+contGral.getVehiculoJPA().getVehiculoCount()+" vehiculos");*/
+        
+        
+               
+            
+            JFrame frame = new JFrame();
+            Reporte reporte = new Reporte();
+            frame.setContentPane(reporte.crearReporte("PrimerReporte.jasper"));
+            frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            frame.setVisible(true);
+   
     }
     
 }

@@ -13,11 +13,13 @@ import javax.persistence.Persistence;
  * @author cristian
  */
 public abstract class ControladoraPersistencia {
+    
     private static EntityManagerFactory emf;
     
     public synchronized EntityManagerFactory getEmf(){
         if(emf==null){
             emf=Persistence.createEntityManagerFactory("ConectandoABDPU");
+            
         }
         return emf;
     }
