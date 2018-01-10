@@ -3,6 +3,21 @@
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["/home/cristian/NetBeansProjects/persistenciaJava/src/reportes/"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select * from vehiculos]]>
+	</queryString>
+	<field name="codigo" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="modelo" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="motor" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -13,23 +28,51 @@
 		<band height="35" splitType="Stretch"/>
 	</pageHeader>
 	<columnHeader>
-		<band height="61" splitType="Stretch">
+		<band height="25" splitType="Stretch">
 			<staticText>
-				<reportElement x="111" y="2" width="100" height="20" uuid="c0dbf80f-96e9-4a69-8a54-29b21f354d3d"/>
+				<reportElement x="24" y="2" width="100" height="20" uuid="b1f2c323-c7b4-481e-bce9-d9b59d7ea5ed"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[codigo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="174" y="2" width="100" height="20" uuid="60688167-9f3f-4c8c-8b17-e42d0197933d"/>
+				<textElement verticalAlignment="Middle"/>
 				<text><![CDATA[modelo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="365" y="2" width="100" height="20" uuid="9efd5109-1da8-4ead-80b7-abd1799e1dee"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[motor]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
 		<band height="125" splitType="Stretch">
 			<textField>
-				<reportElement x="111" y="54" width="100" height="20" uuid="e9daf856-d811-42f7-96db-30e3582d8525"/>
+				<reportElement x="24" y="1" width="100" height="20" uuid="ea8f04e6-bea7-418a-96a8-6b872f377f72"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{codigo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="174" y="0" width="100" height="20" uuid="e9ce4b79-9cb5-41d6-a1ae-4658dbaafdc8"/>
+				<textElement verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{modelo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="365" y="0" width="100" height="20" uuid="c9b17499-3eb4-4546-b3a7-3d659c7c7ed9"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{motor}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
 	<columnFooter>
-		<band height="45" splitType="Stretch"/>
+		<band height="100" splitType="Stretch">
+			<subreport>
+				<reportElement x="28" y="0" width="200" height="100" uuid="9a6466f7-d6a7-41f8-bf6a-2cf60696af40"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["sub.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
 	</columnFooter>
 	<pageFooter>
 		<band height="54" splitType="Stretch"/>
